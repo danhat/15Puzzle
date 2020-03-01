@@ -38,6 +38,7 @@ visited = []
 def get_user_input():
     # get keyboard input
     filename = input('Enter the file name to read from: ')
+    filename = 'input/' + filename
     
     # open and parse file, store integers in a list
     f = open(filename, 'r') 
