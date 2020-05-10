@@ -1,15 +1,19 @@
 """
 Danielle Hatten
-15 Puzzle Using A*
+15 Puzzle Using Iterative Deepening A*
 March 2020
 """
 
-#import heapq
+
 import time
 import os
 import psutil
 import sys
 import copy
+
+nodes_expanded = 0
+explored = []
+heuristic = 'h1'
 
 
 # goal state matrix, used to check if goal state is reached
@@ -20,22 +24,46 @@ goal_matrix = [
         [13, 14, 15, 0]
     ]
 
-# number of expanded nodes and moves
-nodes_expanded = 0
-moves = []
-
 
 
 """
-    Gets keyboard input for input file name, parses input file,
-    and returns a list of integers.
+  Function to get which heuristic the user wants to use:
+    h1 for misplaced tiles,
+    h2 for manhattan distance
+"""
+def get_heuristic():
+  global heuristic
+  h = '0'
+  valid_heuristics = ['h1', 'h2']
+
+  while (h not in valid_heuristics):
+    if (h == 'q'):
+      sys.exit()
+    h = input('\n > Enter a heuristic to use (h1 for misplaced tiles or h2 for manhattan distance): ')
+
+  return h
+  
+
+
+"""
+  Gets keyboard input for input file name, parses input file,
+  and returns a list of integers.
     
-    Returns:
-        list of integers
+  Returns:
+    list of integers
 """
 def get_user_input():
   # get keyboard input
-  filename = input('Enter the file name to read from: ')
+  filename = input('\n > Enter the file name to read from (or \'q\' to quit): ')
+
+  if (filename == 'q'):
+    sys.exit()
+
+  global heuristic
+  if (filename == 'h'):
+      heuristic = get_heuristic()
+      filename = input('\n > Enter the file name to read from (or \'q\' to quit): ')
+
   filename = 'input/' + filename
     
   # open and parse file, store integers in a list
@@ -112,8 +140,8 @@ def check_input(arr):
 
 
 """
-    Node class for states of puzzle
-    s
+    Node class for states of puzzle.
+    
     Contents:
         matrix: state of puzzle
         parent: state of puzzle that the node is derived from
@@ -258,6 +286,37 @@ def move_down(matrix, x, y, parent_node):
   return node
 
 
+
+"""
+  Function to get children of given node.
+  Argument:
+    node to get children of
+  Returns:
+    list of children
+"""
+def get_children(node): 
+  # get position of blank tile
+  x, y, i, j = 99, 99, 0, 0
+  while (i < 4):
+    j = 0
+    while (j < 4):
+      if (node.matrix[i][j] == 0):
+        x, y = i, j
+      j = j + 1
+    i = i + 1
+
+  # get children
+  right_child = move_right(node.matrix, x, y, node)
+  left_child = move_left(node.matrix, x, y, node)
+  up_child = move_up(node.matrix, x, y, node)
+  down_child = move_down(node.matrix, x, y, node)
+
+  children = [right_child, left_child, up_child, down_child]
+
+  return children
+
+
+
 """
   Function for calculating heuristic 1 (misplaced_tiles)
 """
@@ -276,6 +335,7 @@ def h1_misplaced_tiles(matrix):
   return misplaced_tiles
 
 
+
 """
   Function for calculating heuristic 2 (manhattan distance)
 """
@@ -292,7 +352,8 @@ def h2_manhattan_distance(matrix):
           l = 0
           while (l < 4):
             if (goal_matrix[k][l] == value):
-              dis = abs((i + j) - (k + l))
+              #dis = abs((i + j) - (k + l))
+              dis = abs(i - k) + abs(j - l)
               distance = distance + dis
               l, k = 4, 4
             l = l + 1
@@ -303,168 +364,175 @@ def h2_manhattan_distance(matrix):
 
 
 
+
 """
-    Function to solve 15 puzzle using a*.
-    
-    Arguments:
-        4 by 4 matrix
-        heuristic type
-          'h1' or 'h2'
-    Returns:
-        goal state node (unless program exits due to an empty open list)
+  Helper function to idastar().
+  Arguments:
+    path: nodes being searched
+    g: step cost
+    cutoff: current threshold
+  Returns:
+    'found' if solution is found
+    new cutoff(int) if higher cutoff is needed
+    float('inf') if no solution
 """
-def a_star(matrix, heuristic_type): 
-  # head node
-  initial_node = Node(matrix) 
+def search(path, g, cutoff): 
+  node = path[0]
   
-  initial_node.g_n = 0
-  initial_node.f_n = 0
-  open = []
-  closed = []
+  global heuristic
+  global explored
+  global nodes_expanded
 
-  open.append(initial_node)
+  explored.append(node.matrix)
+  nodes_expanded += 1
 
-  while (len(open) > 0):
 
-    pop_index = 0
+  #if (nodes_expanded % 10000 == 0):
+    #print(nodes_expanded)
+
+  f_n = 0 
+  if (heuristic == 'h1'):
+    f_n = g + h1_misplaced_tiles(node.matrix)
+  else:
+    f_n = g + h2_manhattan_distance(node.matrix)
+
+  if (f_n > cutoff):
+    #print('cutoff reached')
+    return f_n  # greater f found
+
+  if (node.matrix == goal_matrix):
+    return 'found' 
+
+  min = float('inf')
+
+  for child in get_children(node):
+    # node already explored or in path, so skip it
+    if child.matrix in explored:
+      continue
+    if child in path:
+      continue
+
+    # if child is not None, search recursively
+    if (child.matrix != None):
+      path.insert(0, child)        
+      temp = search(path, g + 1, cutoff)
+
+      if (temp == 'found'):
+        # solution found
+        return 'found'
+
+      if (temp < float('inf')):
+        # higher cutoff found
+        min = temp
+
+      path.pop(0)
+
+  # no solution, return infinity
+  return min
+
+
+
+
+"""
+  Function to solve 15 puzzle with Iterative Deepening A*
+  Arguments:
+    matrix: 4 by 4, list of 4 lists
+"""
+def idastar(matrix):
+  global heuristic
+  global nodes_expanded
+  global explored
+
+  # initialization
+  path = []
+  nodes_expanded = 0
+  cutoff = 0
+
+  # set cutoff
+  if (heuristic == 'h1'):
+    cutoff = h1_misplaced_tiles(matrix)
+  else:
+    cutoff = h2_manhattan_distance(matrix)
+
+  root = Node(matrix)
+  path.insert(0, root)
+
+  iterations = 0
+
+  while True:
+    explored = []
+
+    iterations += 1
+
+    # begin searching
+    temp = search(path, 0, cutoff)
+
+    if (temp == 'found'):
+      print('\nSolved in', iterations, 'iterations using', heuristic)
+      return path[0]
+
+    # no solution
+    if (temp == float('inf')):
+      sys.exit('This algorithm was not able to find a solution')
+
+    # increase cutoff
+    cutoff = temp
     
-    i = 0
-    # get index of the node with the lowest f(n)
-    while (i < len(open)):
-      if (open[i].f_n < open[pop_index].f_n):
-        pop_index = i
-      i += 1
-
-    # pop node with the lowest f(n)
-    node = open.pop(pop_index)
-    if(node.matrix == goal_matrix):
-      return node
-
-    global nodes_expanded
-    nodes_expanded += 1
-
-    # get position of blank tile
-    x, y, i, j = 99, 99, 0, 0
-    while (i < 4):
-      j = 0
-      while (j < 4):
-        if (node.matrix[i][j] == 0):
-          x, y = i, j
-        j = j + 1
-      i = i + 1
-
-    # get children 
-    right_child = move_right(node.matrix, x, y, node)
-    left_child = move_left(node.matrix, x, y, node)
-    up_child = move_up(node.matrix, x, y, node)
-    down_child = move_down(node.matrix, x, y, node)
-
-    children = [right_child, left_child, up_child, down_child]
-
-    for child in children:
-      if (child.matrix != None):
-
-        # calculate f(n)
-        child.g_n = node.g_n + 1
-        child.h_n = None
-        if (heuristic_type == 'h1'):
-          child.h_n = h1_misplaced_tiles(child.matrix)
-        else:
-          child.h_n = h2_manhattan_distance(child.matrix)
-
-        # calculate and save f(n) aka priority
-        child.f_n = child.g_n + child.h_n
-
-        # child already visited
-        for n in closed:
-          if (child == n):
-            continue
-
-        # child is already in open with lower g(n)
-        for n in open:
-          if (child.matrix == n.matrix and child.f_n > n.f_n):
-            continue
-
-        open.append(child)
-        
-    closed.append(node)
-
-  # open is empty, no solution found
-  sys.exit('A* failed to find a solution.')
-    
 
 
 
-        
-        
+
        
 def main():
-  print('\n15 Puzzle using A*\n')
-
-  input = get_user_input()    
-  matrix = get_matrix(input)
-    
-  global nodes_expanded
-  global moves
-  
-  #################################
-  ##          run A*(h1)         ##
-  #################################
-
-  # start time and memory calculation right before call to bfs 
   process = psutil.Process(os.getpid())
   initial_memory = process.memory_info().rss / 1024.000000
+  print('------------------------------------------')
+  print('| 15 Puzzle using Iterative Deepening A* |')
+  print('------------------------------------------')
+
+  print('\nEnter \'h\' any time to swich heuristics.')
+
+  global heuristic
+  heuristic = get_heuristic()
+
+  input = get_user_input()
+  final_memory = 0
   
-  t = time.process_time()
-  node = a_star(matrix, 'h1')
-
-  # stop time and memory after bfs returns
-  elapsed_time = time.process_time() - t
-  final_memory = process.memory_info().rss / 1024.000000
-    
-    
-  # loop returned bfs node, and get moves
-  while (node is not None):
-    if (node.parent == None):
-      break
-    moves.insert(0, node.move)
-    node = node.parent
+  while (input != 'q'):
+    if (input == 'h'):
+      heuristic = get_heuristic()
+    matrix = get_matrix(input)
   
-  print("--------------------------------------------------")
-  # print moves, nodes expanded, time, and memory usage for A*(h1)
-  print('\n15 Puzzle using A* (using h1)')
-  print('Moves: ', moves)
-  print('Number of Nodes  Expanded: ', nodes_expanded)
-  print("Time Taken: ", '%.5f' % elapsed_time)
-  print('Memory Used: ', '{0:.6f} KB'.format(final_memory - initial_memory))
+    global nodes_expanded
+    global moves
+ 
+    # start time and memory calculation right before call to idastar 
+    t = time.process_time()
+  
+    node = idastar(matrix)
 
-
-
-  #################################
-  ## do the same thing for A*(h2)##
-  #################################
-  nodes_expanded = 0
-  moves = []
-
-  initial_memory = process.memory_info().rss / 1024.000000
-  t = time.process_time()
-  node = a_star(matrix, 'h2')
-
-  elapsed_time = time.process_time() - t
-  final_memory2 = process.memory_info().rss / 1024.000000
+    # stop time and memory after idastar returns
+    elapsed_time = time.process_time() - t
+    final_memory = process.memory_info().rss / 1024.000000
     
-  while (node is not None):
-    if (node.parent == None):
-      break
-    moves.insert(0, node.move)
-    node = node.parent
-
-  print('\n15 Puzzle using A* (using h2)')
-  print('Moves: ', moves)
-  print('Number of Nodes  Expanded: ', nodes_expanded)
-  print("Time Taken: ", '%.5f' % elapsed_time)
-  print('Memory Used: ', '{0:.6f} KB'.format(final_memory2 - final_memory))
+    moves = []
+    # loop returned idastar node, and get moves
+    while (node is not None):
+      if (node.parent == None):
+        break
+      moves.insert(0, node.move)
+      node = node.parent
+  
     
+    # print moves, nodes expanded, time, and memory usage for idastar
+    print('\nMoves: ', moves)
+    print('Number of Nodes  Expanded: ', nodes_expanded)
+    print('Time Taken: ', '%.5f' % elapsed_time)
+    print('Memory Used: ', '{0:.6f} KB'.format(final_memory - initial_memory))
+    print('----------------------------------------------------')
+    input = get_user_input()
+  
+
 
 
 if __name__ == '__main__':
@@ -472,13 +540,4 @@ if __name__ == '__main__':
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     
