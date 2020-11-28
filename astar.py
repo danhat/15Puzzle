@@ -14,11 +14,13 @@ import copy
 
 # goal state matrix, used to check if goal state is reached
 goal_matrix = [
-        [1, 2, 3, 4],
-        [5, 6, 7, 8],
-        [9, 10, 11, 12],
-        [13, 14, 15, 0]
-    ]
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 0]
+]
+
+
 
 # number of expanded nodes and moves
 nodes_expanded = 0
@@ -50,14 +52,14 @@ def get_user_input():
  
     
 """
-    Converts input list of integers into a matrix and returns
-    the matrix.
+  Converts input list of integers into a matrix and returns
+  the matrix.
     
-    Arguments:
-        arr: list of integers
-        
-    Returns:
-        4 by 4 matrix (list of 4 lists with length 4)
+  Arguments:
+    arr: list of integers
+
+  Returns:
+    4 by 4 matrix (list of 4 lists with length 4)
 """
 def get_matrix(arr):
     
@@ -324,7 +326,12 @@ def a_star(matrix, heuristic_type):
 
   open.append(initial_node)
 
+  time1 = time.process_time()
+  timed_out = time.process_time() - time1
   while (len(open) > 0):
+    timed_out = time.process_time() - time1
+    if (timed_out > 4):
+      sys.exit('A* timed out')
 
     pop_index = 0
     

@@ -75,7 +75,67 @@ def get_user_input():
   f.close()
   return results
   
- 
+
+
+
+def get_keyboard_input():
+  input_correct = False, []
+  while (input_correct[0] == False):
+    user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+
+    if (user_input == 'q'):
+      sys.exit()
+
+    global heuristic
+    if (user_input == 'h1'):
+      heuristic = 'h1'
+      print('Heuristic is now set to h1')
+      user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+    elif (user_input == 'h2'):
+      heuristic = 'h2'
+      print('Heuristic is now set to h2')
+      user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+
+    input_correct = check_keyboard_input(user_input)
+
+  return input_correct[1]
+  
+
+def check_keyboard_arr(arr):
+  try:
+    arr = arr.split(',')
+  except: 
+    print('Input Error: Numbers are not sepated by a comma')
+    return False, []
+  
+  try:
+    arr = [int(numeric_string) for numeric_string in arr]
+  except:
+    print('Input Error: Non-intergers entered')
+    return False, []
+
+  if(len(arr) != 16):
+    print('Input Error: Too many or too few numbers entered')
+    return False, []
+    
+  for i in range(len(arr)):
+    if (arr[i] < 0 or arr[i] > 15):
+      print('Input Error: Input is of incorrect format.')
+      return False, []
+
+    j = i + 1
+    while (j < 16):
+      if (arr[i] == arr[j]):
+        print('Input Error: Input contains a repeated number')
+        return False, []
+      j = j + 1
+    
+  return True, arr
+
+
+
+
+
     
 """
     Converts input list of integers into a matrix and returns
@@ -128,13 +188,20 @@ def print_matrix(matrix):
         True (unless program exits due to error)
 """
 def check_input(arr):
+
   if(len(arr) != 16):
-    sys.exit('Too many or too few numbers entered')
+    sys.exit('Input Error: Too many or too few numbers entered')
     
   for i in range(len(arr)):
     if (arr[i] < 0 or arr[i] > 15):
-      sys.exit('Input is of incorrect format.')
+      sys.exit('Input Error: Input is of incorrect format.')
 
+    j = i + 1
+    while (j < 16):
+      if (arr[i] == arr[j]):
+        sys.exit('Input Error: Input contains a repeated number')
+      j = j + 1
+    
   return True
 
 
@@ -532,6 +599,8 @@ def main():
     print('----------------------------------------------------')
     input = get_user_input()
   
+
+
 
 
 
