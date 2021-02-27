@@ -13,7 +13,9 @@
 
 
 ## Illustrations
-![](gif/sol01-crop.gif)
+<p align="center">
+  <img src="gif/sol01-crop.gif" alt="animated"/>
+</p>
 
 ## Technologies
 * Python 3.7
