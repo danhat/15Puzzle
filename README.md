@@ -13,7 +13,7 @@
 
 
 ## Illustrations
-
+![](gif/sol01-crop.gif)
 
 ## Technologies
 * Python 3.7
@@ -31,6 +31,12 @@ $ pip install copy
 $ cd ../15puzzle
 $ py bfs.py
 $ py astar.py
+```
+  
+or
+  
+```
+view the notebook [here](15puzzle.ipynb)
 ```
 
 ## Sources
