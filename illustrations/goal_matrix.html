@@ -1,0 +1,144 @@
+<!DOCTYPE html> 
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	
+    <style>
+      html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center; /*horizontal  center*/
+        justify-content: center;
+      }
+
+      body {
+        background: #80b3ff;
+      }
+
+      
+      .container {
+        /*background-color: grey;*/
+        height: 600px;
+        width: 600px;
+        padding: 2px;
+        /*outline: 20px solid #604020;*/
+        /*border-radius: 25px;*/
+        border: 20px solid #684418;
+        outline: 20px solid #533613;
+      }
+
+      .row {
+        height: 150px;
+        width: 100%;
+        display: flex;
+      }
+
+
+      .column {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center; /*horizontal  center*/
+        justify-content: center;
+      }
+
+      .square {
+        background-color: #3385ff;
+        height: 140px;
+        width: 140px;
+        display: flex;
+        align-items: center; /*horizontal  center*/
+        justify-content: center;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 40px;
+        color: white;
+      }
+
+      #hidden-tile {
+        visibility: hidden;
+      }
+
+
+		
+	  </style>
+  </head>
+  
+  
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="column">
+          <div class="square">1</div>
+        </div>
+        <div class="column">
+          <div class="square">2</div>
+        </div>
+        <div class="column">
+          <div class="square">3</div>
+        </div>
+        <div class="column">
+          <div class="square">4</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="column">
+          <div class="square">5</div>
+        </div>
+        <div class="column">
+          <div class="square">6</div>
+        </div>
+        <div class="column">
+          <div class="square">7</div>
+        </div>
+        <div class="column">
+          <div class="square">8</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="column">
+          <div class="square">9</div>
+        </div>
+        <div class="column">
+          <div class="square">10</div>
+        </div>
+        <div class="column">
+          <div class="square">11</div>
+        </div>
+        <div class="column">
+          <div class="square">12</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="column">
+          <div class="square">13</div>
+        </div>
+        <div class="column">
+          <div class="square">14</div>
+        </div>
+        <div class="column">
+          <div class="square" id="15">15</div>
+        </div>
+        <div class="column" id="empty_square">
+          
+          <!--<div class="square" id="hidden-tile">0</div>-->
+        </div>
+      </div>
+      
+    </div>
+  </body>
+	
+</html>
+
+
+
+
+

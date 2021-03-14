@@ -1,8 +1,4 @@
-"""
-Danielle Hatten
-15 Puzzle Using A*
-March 2020
-"""
+
 
 #import heapq
 import time

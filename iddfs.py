@@ -1,8 +1,4 @@
-﻿"""
-Danielle Hatten
-15 Puzzle Using Iterative Deepening Depth First Search (and Depth Limited Search as a Helper)
-February 2020
-"""
+
 
 import time
 import os

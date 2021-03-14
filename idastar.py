@@ -1,8 +1,4 @@
-"""
-Danielle Hatten
-15 Puzzle Using Iterative Deepening A*
-March 2020
-"""
+
 
 
 import time

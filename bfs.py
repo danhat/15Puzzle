@@ -1,8 +1,4 @@
-"""
-Danielle Hatten
-15 Puzzle Using Breadth First Search
-February 2020
-"""
+
 
 
 from queue import Queue
