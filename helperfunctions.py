@@ -1,9 +1,24 @@
+
 from queue import Queue
 import time
 import os
 import psutil
 import sys
 import copy
+
+
+
+
+"""
+  goal state matrix, used to check if goal state is reached
+"""
+goal_matrix = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 0]
+]
+
 
 
 
@@ -22,11 +37,20 @@ class Node:
     self.move = None
     self.g_n = None # distance from parent node
     self.h_n = None # cost to goal state
-    self.f_n = None
+    self.f_n = None # g_n + f_n
+
+
 
 
 """
+  Get the children nodes (nodes derived from going right, left, down, and up) of the current node
 
+  Arguments:
+    node (Node): node to get the children of
+    expanded (list): list of nodes already visited
+
+  Returns:
+    children (list of <Node>): children nodes
 """
 def get_children(node, expanded): 
   # get position of blank tile
@@ -81,6 +105,85 @@ def get_children(node, expanded):
 
 
 
+
+
+"""
+  Function for calculating heuristic 1 (misplaced_tiles)
+"""
+def h1_misplaced_tiles(matrix):
+  misplaced_tiles = 0
+  i, j = 0, 0
+  while (i < 4):
+    j = 0
+    while (j < 4):
+      # blank tile does not count in distance
+      if (matrix[i][j] != goal_matrix[i][j] and matrix[i][j] != 0):
+        misplaced_tiles = misplaced_tiles + 1 
+      j = j + 1
+    i = i + 1
+
+  return misplaced_tiles
+
+
+
+
+
+"""
+  Function for calculating heuristic 2 (manhattan distance)
+"""
+def h2_manhattan_distance(matrix):
+  i = 0
+  distance = 0
+  while (i < 4):
+    j = 0
+    while (j < 4):
+      if(matrix[i][j] != goal_matrix[i][j] and matrix[i][j] != 0):
+        value = matrix[i][j]
+        k = 0
+        while (k < 4):
+          l = 0
+          while (l < 4):
+            if (goal_matrix[k][l] == value):
+              #dis = abs((i + j) - (k + l))
+              dis = abs(i - k) + abs(j - l)
+              distance = distance + dis
+              l, k = 4, 4
+            l = l + 1
+          k = k + 1
+      j = j + 1
+    i = i + 1
+  return distance
+
+
+
+
+
+
+"""
+  Gets keyboard input for input file name, parses input file,
+  and returns a list of integers.
+    
+  Returns:
+    list of integers
+"""
+def get_user_input():
+  # get keyboard input
+  filename = input('Enter the file name to read from: ')
+  filename = 'input/' + filename
+    
+  # open and parse file, store integers in a list
+  f = open(filename, 'r') 
+  line = f.readline()
+  results = line.split(', ')
+  results = [int(i) for i in results]
+    
+  f.close()
+  return results
+
+
+
+
+
 """
   Checks that input list is the correct lengeth (16) and 
   checks that input integers are in the correct range.
@@ -110,6 +213,82 @@ def check_input(arr):
 
 
 
+
+
+def get_keyboard_input():
+  input_correct = False, []
+  while (input_correct[0] == False):
+    user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+
+    if (user_input == 'q'):
+      sys.exit()
+
+    global heuristic
+    if (user_input == 'h1'):
+      heuristic = 'h1'
+      print('Heuristic is now set to h1')
+      user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+    elif (user_input == 'h2'):
+      heuristic = 'h2'
+      print('Heuristic is now set to h2')
+      user_input = input('\n > Enter the numbers with each number separated by a comma (or \'q\' to quit): ')
+
+    input_correct = check_keyboard_input(user_input)
+
+  return input_correct[1]
+  
+
+def check_keyboard_arr(arr):
+  try:
+    arr = arr.split(',')
+  except: 
+    print('Input Error: Numbers are not sepated by a comma')
+    return False, []
+  
+  try:
+    arr = [int(numeric_string) for numeric_string in arr]
+  except:
+    print('Input Error: Non-intergers entered')
+    return False, []
+
+  if(len(arr) != 16):
+    print('Input Error: Too many or too few numbers entered')
+    return False, []
+    
+  for i in range(len(arr)):
+    if (arr[i] < 0 or arr[i] > 15):
+      print('Input Error: Input is of incorrect format.')
+      return False, []
+
+    j = i + 1
+    while (j < 16):
+      if (arr[i] == arr[j]):
+        print('Input Error: Input contains a repeated number')
+        return False, []
+      j = j + 1
+    
+  return True, arr
+
+
+
+
+
+"""
+  Function to get which heuristic the user wants to use:
+    h1 for misplaced tiles,
+    h2 for manhattan distance
+"""
+def get_heuristic():
+  global heuristic
+  h = '0'
+  valid_heuristics = ['h1', 'h2']
+
+  while (h not in valid_heuristics):
+    if (h == 'q'):
+      sys.exit()
+    h = input('\n > Enter a heuristic to use (h1 for misplaced tiles or h2 for manhattan distance): ')
+
+  return h
 
 
 
@@ -152,15 +331,13 @@ def print_matrix(matrix):
   for i in range(len(matrix)):
     print(matrix[i])
   #print("\n")
-  
-  
-  
-  
+
+
 
 
 
 """
-
+  Prints the moves, number of nodes expanded, time taken, and the memory used to find the solution
 """
 def print_search_info(node, expanded_nodes_count, elapsed_time, memory_used):
   moves = []
@@ -176,3 +353,4 @@ def print_search_info(node, expanded_nodes_count, elapsed_time, memory_used):
   print('Number of Nodes  Expanded: ', expanded_nodes_count)
   print("Time Taken: ", '%.7f' % elapsed_time, 'nanoseconds')
   print('Memory Used: ', '{0:.2f} KB'.format(memory_used) + '\n')
+
