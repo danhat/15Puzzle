@@ -79,7 +79,7 @@ def dls(node, depth, expanded):
       an unitialized node if goal is not found or the goal node if the goal node is reached      
         
 """
-def iddfs(matrix):
+def iddfs(matrix, return_info):
   # start time right before call to bfs  
   initial_time = time.process_time()
 
@@ -107,7 +107,10 @@ def iddfs(matrix):
       # get memory usage
       final_memory = process.memory_info().rss / 1024.000000
       memory_used = final_memory - initial_memory
-      print_search_info(found, expanded_nodes_count, elapsed_time, memory_used)
+      if (return_info == True):
+        return (found, expanded_nodes_count, elapsed_time, memory_used)
+      else:
+        print_search_info(found, expanded_nodes_count, elapsed_time, memory_used)
       return found
     # dls will set remaining to false when there are no more nodes to expand
     # function will then stop looping and return an empty node
@@ -126,7 +129,8 @@ def main():
     print('\ninitial state:')
     print_matrix(matrix)
     
-    node = iddfs(matrix)
+    node = iddfs(matrix, True)
+    print(node[1])
     
 
 

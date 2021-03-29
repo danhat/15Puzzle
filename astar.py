@@ -60,7 +60,7 @@ def h2_manhattan_distance(matrix):
     Returns:
         goal state node (unless program exits due to an empty open list)
 """
-def a_star(matrix, heuristic_type): 
+def a_star(matrix, heuristic_type, return_info): 
   process = psutil.Process(os.getpid())
   initial_memory = process.memory_info().rss / 1024.000000
 
@@ -100,8 +100,11 @@ def a_star(matrix, heuristic_type):
       elapsed_time = time.process_time() - initial_time
       final_memory = process.memory_info().rss / 1024.000000
       memory_used = final_memory - initial_memory
-      print_search_info(node, expanded_nodes_count, elapsed_time, memory_used)
-      return node
+      if (return_info == True):
+        return (node, expanded_nodes_count, elapsed_time, memory_used)
+      else:
+        print_search_info(node, expanded_nodes_count, elapsed_time, memory_used)
+        return node
 
     expanded_nodes_count += 1
 
@@ -164,11 +167,12 @@ def main():
   
   
   print('\nA* using h1...')
-  node = a_star(matrix, 'h1')
+  node = a_star(matrix, 'h1', False)
 
 
   print('\n\nA* using h2...')
-  node = a_star(matrix, 'h2')
+  node = a_star(matrix, 'h2', True)
+  print(node[1])
 
   
 

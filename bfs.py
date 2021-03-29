@@ -14,7 +14,7 @@ from helperfunctions import *
   Returns:
     goal state node (unless program exits due to an empty queue)
 """
-def bfs(matrix): 
+def bfs(matrix, return_info): 
   # start timer 
   initial_time = time.process_time()
   
@@ -27,10 +27,20 @@ def bfs(matrix):
   # head node
   initial_node = Node(matrix) 
 
+
   # check to see if initial matrix is the goal state
   # if so, return that node
   if (initial_node.matrix == goal_matrix):
-    return initial_node
+    # stop time when goal matrix is found
+    elapsed_time = time.process_time() - initial_time
+    # get memory usage
+    final_memory = process.memory_info().rss / 1024.000000
+    memory_used = final_memory - initial_memory
+    if (return_info == True):
+      return (initial_node, expanded_nodes_count, elapsed_time, memory_used)
+    else:
+      print_search_info(initial_node, expanded_nodes_count, elapsed_time, memory_used)
+      return initial_node
     
   # initialize queue and enqueue head node
   q = Queue()
@@ -58,7 +68,10 @@ def bfs(matrix):
         # get memory usage
         final_memory = process.memory_info().rss / 1024.000000
         memory_used = final_memory - initial_memory
-        print_search_info(child, expanded_nodes_count, elapsed_time, memory_used)
+        if (return_info == True):
+          return (child, expanded_nodes_count, elapsed_time, memory_used)
+        else:
+          print_search_info(child, expanded_nodes_count, elapsed_time, memory_used)
         return False
         #return child
       if (child.matrix != None):
@@ -78,7 +91,8 @@ def main():
   print('\ninitial state:')
   print_matrix(matrix)
     
-  node = bfs(matrix)
+  node = bfs(matrix, False)
+  #print(node[1])
 
 
 if __name__ == '__main__':
