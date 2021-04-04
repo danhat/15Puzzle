@@ -95,7 +95,6 @@ def iddfs(matrix, return_info):
 
   while (depth >= 0):
     expanded_nodes_count = expanded_nodes_count + len(expanded_nodes)
-    print(len(expanded_nodes))
     # reset visited list for next iteration of dls
     expanded_nodes = []
     expanded_nodes.append(node.matrix)
@@ -128,7 +127,8 @@ def main():
   print('\ninitial state:')
   print_matrix(matrix)
 
-  node = iddfs(matrix, False)
+  node = iddfs(matrix, True)
+  print(node[1])
     
 
 
