@@ -10,7 +10,7 @@
 
 
 ## Table of contents
-* [General info](#general-info)
+* [General Info](#general-info)
 * [Setup](#setup)
 * [Sources](#sources)
 
@@ -23,7 +23,9 @@
 15 Puzzle is a sliding puzzle that consists of a 4 by 4 grid with 16 square tiles. 15 of the tiles are numbered 1 through 15 in random order and one tile is empty. The goal of the puzzle is to order the tiles from 1-15 by sliding the numbered tiles into the empty tile slot one at a time. The puzzle is complete when it reaches the state in the below picture, referred to as the goal state.
 
 
-<center><img src="images/goal_matrix.png" width="300px"/></center>
+<p align="center">
+  <img src="images/goal_matrix.png" width="300px"/>
+</p>
 
 <br>
 

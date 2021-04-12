@@ -5,50 +5,6 @@ from helperfunctions import *
 
 
 
-"""
-  Function for calculating heuristic 1 (misplaced_tiles)
-"""
-def h1_misplaced_tiles(matrix):
-  misplaced_tiles = 0
-  i, j = 0, 0
-  while (i < 4):
-    j = 0
-    while (j < 4):
-      # blank tile does not count in distance
-      if (matrix[i][j] != goal_matrix[i][j] and matrix[i][j] != 0):
-        misplaced_tiles = misplaced_tiles + 1 
-      j = j + 1
-    i = i + 1
-
-  return misplaced_tiles
-
-
-"""
-  Function for calculating heuristic 2 (manhattan distance)
-"""
-def h2_manhattan_distance(matrix):
-  i = 0
-  distance = 0
-  while (i < 4):
-    j = 0
-    while (j < 4):
-      if(matrix[i][j] != goal_matrix[i][j] and matrix[i][j] != 0):
-        value = matrix[i][j]
-        k = 0
-        while (k < 4):
-          l = 0
-          while (l < 4):
-            if (goal_matrix[k][l] == value):
-              dis = abs((i + j) - (k + l))
-              distance = distance + dis
-              l, k = 4, 4
-            l = l + 1
-          k = k + 1
-      j = j + 1
-    i = i + 1
-  return distance
-
-
 
 """
     Function to solve 15 puzzle using a*.
@@ -60,7 +16,7 @@ def h2_manhattan_distance(matrix):
     Returns:
         goal state node (unless program exits due to an empty open list)
 """
-def a_star(matrix, heuristic_type, return_info): 
+def astar(matrix, heuristic_type, return_info): 
   process = psutil.Process(os.getpid())
   initial_memory = process.memory_info().rss / 1024.000000
 
@@ -81,8 +37,8 @@ def a_star(matrix, heuristic_type, return_info):
   
   while (len(open_list) > 0):
     timed_out = time.process_time() - initial_time
-    if (timed_out > 3):
-      print('A* timed out')
+    if (timed_out > 10):
+      print('\n**A* timed out**')
       return
     pop_index = 0
 
@@ -95,6 +51,9 @@ def a_star(matrix, heuristic_type, return_info):
 
     # pop node with the lowest f(n)
     node = open_list.pop(pop_index)
+
+    expanded_nodes_count = expanded_nodes_count + 1
+    
     if(node.matrix == goal_matrix):
       # stop time and memory after bfs returns
       elapsed_time = time.process_time() - initial_time
@@ -106,7 +65,6 @@ def a_star(matrix, heuristic_type, return_info):
         print_search_info(node, expanded_nodes_count, elapsed_time, memory_used)
         return node
 
-    expanded_nodes_count += 1
 
     # get position of blank tile
     x, y, i, j = 99, 99, 0, 0
@@ -164,12 +122,13 @@ def main():
   
   
   print('\nA* using h1...')
-  node = a_star(matrix, 'h1', False)
+  node = astar(matrix, 'h1', False)
 
 
   print('\n\nA* using h2...')
-  node = a_star(matrix, 'h2', True)
-  print(node[1])
+  node = astar(matrix, 'h2', False)
+  #node = astar(matrix, 'h2', True)
+  #print(node[1])
 
   
 

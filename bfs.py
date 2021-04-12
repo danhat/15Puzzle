@@ -45,9 +45,15 @@ def bfs(matrix, return_info):
   q.put(initial_node)  
 
   while True:
+    timed_out = time.process_time() - initial_time
+    if (timed_out > 3):
+      print('\n**BFS timed out**')
+      return
+
     # if queue is empty, no solution is able to be found using this program
     if(q.empty() == True):
-      sys.exit('BFS failed to find a solution.')
+      print('BFS failed to find a solution.')
+      return
         
     # get node at the front of queue
     node = q.get()
@@ -80,14 +86,18 @@ def bfs(matrix, return_info):
     
     
 def main():
-  print('\n**15 Puzzle using BFS**\n')
+  
 
-  input = get_user_input()    
+  input = get_user_input()     
+    
+  print('\n15 Puzzle using BFS')
+   
   matrix = get_matrix(input)
-    
-    
-  print('\ninitial state:')
+
+  print('\nInitial State: \n')
+
   print_matrix(matrix)
+  print('\n')
     
   node = bfs(matrix, False)
 

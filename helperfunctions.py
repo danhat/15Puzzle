@@ -349,8 +349,8 @@ def print_search_info(node, expanded_nodes_count, elapsed_time, memory_used):
     node = node.parent
 
   # print moves, nodes expanded, time, and memory usage
-  print('\nMoves: ', moves)
+  print('Moves: ', moves)
   print('Number of Nodes  Expanded: ', expanded_nodes_count)
-  print("Time Taken: ", '%.7f' % elapsed_time, 'nanoseconds')
-  print('Memory Used: ', '{0:.2f} KB'.format(memory_used) + '\n')
+  print("Time Taken: ", '%.7f' % elapsed_time, 'seconds')
+  print('Memory Used: ', '{0:.3f} KB'.format(memory_used) + '\n')
 

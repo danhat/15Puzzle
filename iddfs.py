@@ -5,29 +5,29 @@ from helperfunctions import *
 
 
 """
-    Recursive helper function to iddfs().
-    Depth Limited Search function.
-    Searches for goal node up until depth limit which is passed as an arg
+  Recursive helper function to iddfs().
+  Depth Limited Search function.
+  Searches for goal node up until depth limit which is passed as an arg
     
-    Arguments:
-      node: Node object containing the matrix, move to get to the state, and the parent of the node
-      depth: the depth to search to on a node
+  Arguments:
+    node: Node object containing the matrix, move to get to the state, and the parent of the node
+    depth: the depth to search to on a node
         
-    Returns:
-      (Node(), boolean)
-      an unitialized node if goal is not found or the goal node
-      True if there are children nodes, False if there are no children nodes      
+  Returns:
+    (Node(), boolean)
+    an unitialized node if goal is not found or the goal node
+    True if there are children nodes, False if there are no children nodes      
         
 """
-def dls(node, depth, expanded): 
+def dls(node, depth, expanded_nodes):
   # goal node is found, return it
   if (node.matrix == goal_matrix):
-    return node, True
+    return node, True, expanded_nodes
 
   # depth limit reached, so return None, True 
   # bc there may be children node to search
   elif (depth == 0):
-    return Node(), True
+    return Node(), True, expanded_nodes
   
   # depth limit not reached and goal node not found,
   # so get children and continue dls
@@ -45,36 +45,38 @@ def dls(node, depth, expanded):
     nodes_remaining = False
 
     # get children 
-    children = get_children(node, expanded)
+    children = get_children(node, expanded_nodes)
 
     for child in children:
       # check if child exists
       if (child.matrix != None):
+        # add to expanded
+        expanded_nodes.append(child.matrix)
         # call dls for child if it exists
-        found, remaining = dls(child, depth - 1, expanded)
+        found, remaining, expanded_nodes = dls(child, depth - 1, expanded_nodes)
         if (found.matrix != None):
           # goal node found, return it
-          return found, True
+          return found, True, expanded_nodes
         # goal node not found, but there are remaining nodes
         if (remaining == True):
           nodes_remaining = True
     
-    # no remaining nodes => ends iddfs
-    return Node(), nodes_remaining
+    # no remaining nodes => end iddfs
+    return Node(), nodes_remaining, expanded_nodes
 
 
 
 
     
 """
-    Iterative Deepening Depth First Search function.
-    Searches for goal node by increasing the depth limit by 1 with each iteration.
+  Iterative Deepening Depth First Search function.
+  Searches for goal node by increasing the depth limit by 1 with each iteration.
     
-    Arguments:
-      node: Node object containing the initial state
+  Arguments:
+    node: Node object containing the initial state
         
-    Returns:
-      an unitialized node if goal is not found or the goal node if the goal node is reached      
+  Returns:
+    an unitialized node if goal is not found or the goal node if the goal node is reached      
         
 """
 def iddfs(matrix, return_info):
@@ -94,12 +96,18 @@ def iddfs(matrix, return_info):
   depth = 0
 
   while (depth >= 0):
+    timed_out = time.process_time() - initial_time
+    if (timed_out > 3):
+      print('\n**IDDFS timed out**')
+      return
+
     expanded_nodes_count = expanded_nodes_count + len(expanded_nodes)
-    print(len(expanded_nodes))
+
     # reset visited list for next iteration of dls
     expanded_nodes = []
     expanded_nodes.append(node.matrix)
-    found, remaining = dls(node, depth, expanded_nodes)
+    found, remaining, expanded_nodes = dls(node, depth, expanded_nodes)
+
     if (found.matrix != None):
       # stop time when goal matrix is found
       elapsed_time = time.process_time() - initial_time
@@ -120,13 +128,15 @@ def iddfs(matrix, return_info):
     
     
 def main():
-  print('\n**15 Puzzle using IDDFS**\n')
 
   input = get_user_input()    
-  matrix = get_matrix(input)    
+  matrix = get_matrix(input)  
+  
+  print('\n15 Puzzle using IDDFS')
 
-  print('\ninitial state:')
+  print('\nInitial State: \n')
   print_matrix(matrix)
+  print('\n')
 
   node = iddfs(matrix, False)
     
