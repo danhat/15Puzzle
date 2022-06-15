@@ -11,6 +11,7 @@
 
 ## Table of contents
 * [General Info](#general-info)
+* [Libraries](#libraries)
 * [Setup](#setup)
 * [Sources](#sources)
 
@@ -45,9 +46,12 @@ The measures used to compare performance are:
 - time taken
 
 
+<br>
 
-
-
+## Libraries
+* [psutil](https://psutil.readthedocs.io/en/latest/)
+* [time](https://docs.python.org/3/library/time.html)
+* [os](https://docs.python.org/3/library/os.html)
 
 <br>
 
