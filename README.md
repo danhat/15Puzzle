@@ -42,8 +42,8 @@ The algorithms used to find solutions are:
 
 The measures used to compare performance are:
 - number of nodes (grid derivatives) expanded
-- memory used
-- time taken
+- memory used (KB)
+- time taken (secs)
 
 
 <br>
